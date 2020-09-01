@@ -118,6 +118,27 @@ impl Vec3 {
     fn dump(&self) {
         println!("{} {} {}", self.x, self.y, self.z);
     }
+
+    fn dot(&self, other:Self) -> f64 {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+
+    fn cross(&self, other:Self) -> Vec3 {
+        Self {
+            x:self.y * other.z - self.z * other.y,
+            y:self.z * other.x + self.x * other.z,
+            z:self.x * other.y - self.y * other.x
+        }
+    }
+}
+
+fn write_color(vec: &Vec3) {
+    let scale = 255.999;
+    println!("{} {} {}",
+             (vec.x * scale) as u32,
+             (vec.y * scale) as u32,
+             (vec.z * scale) as u32
+    );
 }
 
 #[cfg(test)]
