@@ -1,10 +1,23 @@
-use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign, Div, DivAssign};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     x: f64,
     y: f64,
     z: f64
+}
+
+impl Div<f64> for Vec3 {
+    type Output = Self;
+    fn div(self, other:f64) -> Vec3 {
+        Vec3{x:self.x / other, y:self.y / other, z:self.z / other}
+    }
+}
+
+impl DivAssign<f64> for Vec3 {
+    fn div_assign(&mut self, other:f64) {
+        *self = Self{x:self.x / other, y:self.y / other, z:self.z / other};
+    }
 }
 
 impl Add for Vec3 {
@@ -23,15 +36,12 @@ impl Sub for Vec3 {
     }
 }
 
-
 impl Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, other:Vec3) -> Vec3 {
         Vec3{x:self.x * other.x, y:self.y * other.y, z:self.z * other.z}
     }
-
-
 }
 
 impl Mul<f64> for Vec3 {
@@ -56,7 +66,7 @@ impl AddAssign for Vec3 {
             x:self.x + other.x,
             y:self.y + other.y,
             z:self.z + other.z
-        }
+        };
     }
 }
 
@@ -87,7 +97,26 @@ impl MulAssign<f64> for Vec3 {
             x:self.x * other,
             y:self.y * other,
             z:self.z * other
-        }
+        };
+    }
+}
+
+
+impl Vec3 {
+    fn length_sq(&self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+
+    fn length(&self) -> f64 {
+        self.length_sq().sqrt()
+    }
+
+    fn unit(&self) -> Vec3 {
+       (*self) / self.length()
+    }
+
+    fn dump(&self) {
+        println!("{} {} {}", self.x, self.y, self.z);
     }
 }
 
@@ -159,5 +188,14 @@ mod tests {
         assert_eq!(mul2.x, 10.0);
         assert_eq!(mul2.y, 10.0);
         assert_eq!(mul2.z, 10.0);
+    }
+
+    #[test]
+    fn vec3_length() {
+        let v = Vec3{x:1., y:1., z:1.};
+        assert_eq!(v.length_sq(), 3.);
+
+        assert_eq!(v.length(), 3_f64.sqrt());
+
     }
 }
