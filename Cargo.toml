@@ -1,2 +1,2 @@
 [workspace]
-members = ["src/ppm"]
+members = ["src/ppm", "src/lib"]
