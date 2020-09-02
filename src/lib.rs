@@ -103,27 +103,27 @@ impl MulAssign<f64> for Vec3 {
 
 
 impl Vec3 {
-    fn length_sq(&self) -> f64 {
+    pub fn length_sq(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    fn length(&self) -> f64 {
+    pub fn length(&self) -> f64 {
         self.length_sq().sqrt()
     }
 
-    fn unit(&self) -> Vec3 {
+    pub fn unit(&self) -> Vec3 {
        (*self) / self.length()
     }
 
-    fn dump(&self) {
+    pub fn dump(&self) {
         println!("{} {} {}", self.x, self.y, self.z);
     }
 
-    fn dot(&self, other:Self) -> f64 {
+    pub fn dot(&self, other:Self) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    fn cross(&self, other:Self) -> Vec3 {
+    pub fn cross(&self, other:Self) -> Vec3 {
         Self {
             x:self.y * other.z - self.z * other.y,
             y:self.z * other.x + self.x * other.z,
@@ -132,7 +132,7 @@ impl Vec3 {
     }
 }
 
-fn write_color(vec: &Vec3) {
+pub fn write_color(vec: &Vec3) {
     let scale = 255.999;
     println!("{} {} {}",
              (vec.x * scale) as u32,
