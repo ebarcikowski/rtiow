@@ -1,2 +1,14 @@
-[workspace]
-members = ["src/ppm", "src/lib"]
+[package]
+name = "rtiow"
+version = "0.1.0"
+authors = ["Elliott Barcikowski ebarcikowski@gmail.com"]
+
+[lib]
+name = "rtiow"
+create-type = ["cdynlib"]
+bench = false
+
+[[bin]]
+name = "ppm"
+
+# file = "src/bin/ppm.rs"
