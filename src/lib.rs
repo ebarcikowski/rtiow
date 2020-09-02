@@ -141,6 +141,17 @@ pub fn write_color(vec: &Vec3) {
     );
 }
 
+pub struct ray {
+    pub origin: Vec3;
+    pub dir: Vec3;
+}
+
+impl ray {
+    fn at(&self, t:f64) -> Vec3 {
+        self.origin + t * dir;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
