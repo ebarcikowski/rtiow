@@ -12,7 +12,7 @@ bench = false
 name = "ppm"
 
 [[bin]]
-name = "blended"
+name = "sphere"
 
 
 
