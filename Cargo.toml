@@ -11,4 +11,10 @@ bench = false
 [[bin]]
 name = "ppm"
 
+[[bin]]
+name = "blended"
+
+
+
+
 # file = "src/bin/ppm.rs"

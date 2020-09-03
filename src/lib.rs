@@ -36,6 +36,14 @@ impl Sub for Vec3 {
     }
 }
 
+impl Mul<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, other:Vec3) -> Vec3 {
+        Vec3{x:self * other.x, y:self * other.y, z:self * other.z}
+    }
+}
+
 impl Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
@@ -141,14 +149,14 @@ pub fn write_color(vec: &Vec3) {
     );
 }
 
-pub struct ray {
-    pub origin: Vec3;
-    pub dir: Vec3;
+pub struct Ray {
+    pub origin: Vec3,
+    pub dir: Vec3
 }
 
-impl ray {
+impl Ray {
     fn at(&self, t:f64) -> Vec3 {
-        self.origin + t * dir;
+        self.origin + self.dir * t
     }
 }
 
