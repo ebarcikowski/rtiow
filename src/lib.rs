@@ -160,6 +160,57 @@ impl Ray {
     }
 }
 
+pub struct HitRecord {
+    pub p: Vec3,
+    normal: Vec3,
+    t: f64,
+    front_face: bool
+}
+
+trait Hittable {
+    fn hit(&self, r:Ray, t_min:f64, t_max:f64, rec: &HitRecord) -> Option<HitRecord>;
+}
+
+pub struct Sphere {
+    center: Vec3,
+    radius: f64
+}
+
+impl Hittable for Sphere {
+    fn hit(&self, r:Ray, t_min:f64, t_max:f64, rec: &HitRecord) -> Option<HitRecord> {
+        let oc = r.origin - self.center;
+        let a = r.dir.length_sq();
+        let half_b = oc.dot(r.dir);
+        let c = oc.length_sq() - self.radius * self.radius;
+        let dis = half_b * half_b - a * c;
+
+        if dis > 0.0 {
+            let root = dis.sqrt();
+            let temp = (-half_b - root) / a;
+            if temp < t_max && temp > t_min {
+                let t = temp;
+                let p = r.at(rec.t);
+                let normal = (p - self.center) / self.radius;
+                let mut hr = HitRecord {p, t, normal, front_face:false};
+                git let outward_normal = (rec.p - self.center) / self.radius;
+                hr.set_face_normal(&r, &outward_normal);
+                return Some(hr);
+            }
+        }
+        None
+    }
+}
+
+impl HitRecord {
+    fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
+        self.front_face = r.dir.dot(*outward_normal) < 0.0;
+        if !self.front_face {
+            self.normal = - *outward_normal;
+        }
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
