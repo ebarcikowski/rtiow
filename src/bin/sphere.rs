@@ -1,6 +1,7 @@
 extern crate rtiow;
 
-use rtiow::{Vec3, Ray, write_color};
+use rtiow::{Vec3, Ray, write_color, Hittable, Sphere};
+
 
 fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
     let oc = ray.origin - *center;
@@ -14,27 +15,24 @@ fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
     (-half_b - dis.sqrt()) / a
 }
 
-fn ray_color(r: &Ray) -> Vec3 {
-    let c = Vec3{x:0.0, y:0.0, z:-1.0};
-    // distance from source to edge of sphere.
-    let t = hit_sphere(&c, 0.5, r);
-    if t > 0.0 {
-        // normal on sphere is ray - center of sphere.
-        let n = (r.at(t) - Vec3{x:0.0, y:0.0, z:-1.0}).unit();
-        // RGB color is simply the x, y and z components
-        return 0.5 * Vec3{x:n.x + 1.0, y:n.y + 1.0, z:n.z + 1.0}
-    }
-    // Missed the sphere. Just use same background.
-    let ud = r.dir.unit();
-    // Why s? I wanted a new variable that's like t, so s. Yeah kind of lazy.
-    let s = 0.5 * (ud.y + 1.0);
-    (1.0 - s) * Vec3{x:1.0, y:1.0, z:1.0} + s * Vec3{x:0.5, y:0.7, z:1.0}
+fn ray_color<T:Hittable>(r: &Ray, world: &T) -> Vec3 {
+    match world.hit(r, 0.0, f64::INFINITY) {
+        Some(hr) => return 0.5 * (hr.normal + Vec3 { x: 1.0, y: 1.0, z: 1.0 }),
+        None => ()
+    };
+    let dir = r.dir.unit();
+    let t = 0.5 * (dir.y + 1.0);
+    (1.0 - t) * Vec3{x:1.0, y:1.0, z:1.0} + t * Vec3{x:0.5, y: 0.7, z:1.0}
 }
 
 fn main() {
     let ar = 16.0 / 9.0;
     let image_width = 400;
     let image_height = ((image_width as f64) / ar) as i32;
+
+    let mut world = Vec::<Box<dyn Hittable>>::new();
+    world.push(Box::new(Sphere{center:Vec3{x:0.0, y:0.0, z:-1.0}, radius:0.5}));
+    world.push(Box::new(Sphere{center:Vec3{x:0.0, y:-100.5, z:-1.0}, radius:100.}));
 
     let viewport_height = 2.0;
     let viewport_width = ar * viewport_height;
@@ -55,7 +53,7 @@ fn main() {
             let v = (j as f64) / ((image_height - 1) as f64);
             let dir = lower_left_corner + u * horizontal + v * vertical - origin;
             let r = Ray{origin, dir};
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
             write_color(&pixel_color);
         }
     }

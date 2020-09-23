@@ -162,22 +162,22 @@ impl Ray {
 
 pub struct HitRecord {
     pub p: Vec3,
-    normal: Vec3,
-    t: f64,
-    front_face: bool
+    pub normal: Vec3,
+    pub t: f64,
+    pub front_face: bool
 }
 
-trait Hittable {
-    fn hit(&self, r:Ray, t_min:f64, t_max:f64, rec: &HitRecord) -> Option<HitRecord>;
+pub trait Hittable {
+    fn hit(&self, r:&Ray, t_min:f64, t_max:f64) -> Option<HitRecord>;
 }
 
 pub struct Sphere {
-    center: Vec3,
-    radius: f64
+    pub center: Vec3,
+    pub radius: f64
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r:Ray, t_min:f64, t_max:f64, rec: &HitRecord) -> Option<HitRecord> {
+    fn hit(&self, r:&Ray, t_min:f64, t_max:f64) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.dir.length_sq();
         let half_b = oc.dot(r.dir);
@@ -189,10 +189,10 @@ impl Hittable for Sphere {
             let temp = (-half_b - root) / a;
             if temp < t_max && temp > t_min {
                 let t = temp;
-                let p = r.at(rec.t);
+                let p = r.at(t);
                 let normal = (p - self.center) / self.radius;
                 let mut hr = HitRecord {p, t, normal, front_face:false};
-                git let outward_normal = (rec.p - self.center) / self.radius;
+                let outward_normal = (p - self.center) / self.radius;
                 hr.set_face_normal(&r, &outward_normal);
                 return Some(hr);
             }
@@ -210,6 +210,23 @@ impl HitRecord {
     }
 }
 
+// use Vec<Box<dyn Hittable>> as HitList;
+
+impl Hittable for Vec<Box<dyn Hittable>> {
+    fn hit(&self, r:&Ray, t_min:f64, t_max:f64) -> Option<HitRecord> {
+        let mut closest = t_max;
+        let mut rt = None;
+        for obj in self {
+            let hr = match obj.hit(&r, t_min, closest) {
+                Some(v) => v,
+                None => continue
+            };
+            closest = hr.t;
+            rt = Some(hr);
+        }
+        rt
+    }
+}
 
 #[cfg(test)]
 mod tests {
